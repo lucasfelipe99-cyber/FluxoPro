@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: fluxopro-api
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: FluxoPro
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 720
+      - key: CORS_ORIGINS
+        value: https://fluxopro.com.br,https://www.fluxopro.com.br
+      - key: APP_BASE_URL
+        value: https://fluxopro.com.br
+      - key: API_BASE_URL
+        value: https://api.fluxopro.com.br/api
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: MERCADO_PAGO_ACCESS_TOKEN
+        sync: false
+      - key: MERCADO_PAGO_MONTHLY_PRICE
+        value: 29.90
+      - key: MERCADO_PAGO_ANNUAL_PRICE
+        value: 299.90
+
+  - type: web
+    name: fluxopro-web
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://api.fluxopro.com.br/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
